@@ -23,9 +23,6 @@ from urllib.parse import quote_plus
 
 import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine, text
-from sqlalchemy.dialects.mssql import DATETIME2
-from sqlalchemy.types import String
 
 REQUIRED_COLUMNS = [
     "timestamp", "label", "destination_port", "flow_duration",
@@ -152,6 +149,8 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
 
 # --------------------------------------------------------- 3. Load to SQL Server
 def get_engine(server: str, database: str, driver: str):
+    from sqlalchemy import create_engine  # imported lazily: dry run doesn't need it
+
     user, pwd = os.getenv("SQL_USER"), os.getenv("SQL_PASSWORD")
     auth = f"UID={user};PWD={pwd};" if user and pwd else "Trusted_Connection=yes;"
     conn_str = (
@@ -165,6 +164,10 @@ def get_engine(server: str, database: str, driver: str):
 
 
 def upload(df: pd.DataFrame, engine, table: str, if_exists: str) -> None:
+    from sqlalchemy import text
+    from sqlalchemy.dialects.mssql import DATETIME2
+    from sqlalchemy.types import String
+
     dtypes = {
         "timestamp": DATETIME2(0),
         "label": String(50),
