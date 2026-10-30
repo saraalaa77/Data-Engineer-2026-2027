@@ -1,0 +1,4 @@
+venv/
+__pycache__/
+validated_features.csv
+cleaned_cic_ids2017.csv
